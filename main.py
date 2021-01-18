@@ -95,12 +95,14 @@ async def create_note(note: NoteIn):
 async def update_note(note_id: int, payload: NoteIn):
     #first we create a query to select note from table
     q = notes.select().where(notes.c.id == note_id)
-    rows = await database.fetch_one(q)
-    
- 
-
-    #text = payload.text or 
-    query = notes.update(None).where(notes.c.id == note_id).values(text=payload.text, completed=payload.completed)
+    #then we select the row from the database using fetch_one
+    row = await database.fetch_one(q)    
+    #then we store the data into varialbes
+    text = payload.text or row['text']
+    completed = payload.completed or row['completed']
+    #make the query - don't forget to assign the parameter variables accordingly 
+    query = notes.update(None).where(notes.c.id == note_id).values(text=text, completed=completed)
+    #send it to db
     await database.execute(query)
     return {**payload.dict(), "id": note_id}
 
@@ -117,7 +119,8 @@ async def read_notes(skip: int = 0, take: int = 20):
 @app.get("/notes/{note_id}/", response_model=Note, status_code= status.HTTP_200_OK)
 async def read_note(note_id: int):
     query = notes.select().where(notes.c.id == note_id)
-    return await database.fetch_one(query) 
+    result = await database.fetch_one(query)
+    return result
 
 #delete
 @app.delete("/notes/{note_id}/", status_code=status.HTTP_200_OK)
