@@ -11,5 +11,5 @@
 <ol>
     <li>SQLalchemy</li>
     <li>FastApi</li>
-    <li>Encode: DB (for query execution and selection)</li>
+    <li>Starlette - Databases (for query execution and selection)</li>
 </ol>
